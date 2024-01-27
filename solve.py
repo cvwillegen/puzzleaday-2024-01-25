@@ -21,21 +21,29 @@ board = [
     '############',
 ]
 
+# Find the indicated position on the board
+def positions(board, place):
+    return [ (x, y, )
+                for y in range(0, len(board))
+                for x in range(0, len(board[y]))
+                if board[y][x] == place
+           ]
+
 # Find the starting position on the board
 def startPosition(board):
-    for y in range(0, len(board)):
-        for x in range(0, len(board[y])):
-            if board[y][x] == 'S':
-                return (x, y,)
+    position = positions(board, 'S')
+
+    if len(position) == 1:
+        return position[0]
 
     raise ValueError("No valid start position")
 
 # Find the end position on the board
 def endPosition(board):
-    for y in range(0, len(board)):
-        for x in range(0, len(board[y])):
-            if board[y][x] == 'F':
-                return (x, y,)
+    position = positions(board, 'F')
+
+    if len(position) == 1:
+        return position[0]
 
     raise ValueError("No valid end position")
 
@@ -61,16 +69,16 @@ def move(x, y, dir, step):
 # Determine if any of the paths has reached the end position
 # If true, return the description of the path from start to finish
 def hasReached(board, start, paths):
-    (sx, sy,) = start
+    (sx, sy, ) = start
     for path in paths:
-        (x, y) = (0, 0)
+        (x, y, ) = (0, 0, )
         for idx, dir in enumerate(path):
             step = (idx % 3)+1
             (x, y, ) = move(x, y, dir, step)
 
         if board[y+sy][x+sx] == 'F':
             describe = ""
-            (x, y) = (0, 0)
+            (x, y, ) = (0, 0, )
             describe += f"Start at ({x}, {y})\n"
             for idx, dir in enumerate(path):
                 step = (idx % 3)+1
@@ -90,10 +98,12 @@ def hasReached(board, start, paths):
 
 # Check to see if direction dir can be added to path
 def canadd(board, start, path, dir):
-    (sx, sy,) = start
+    (sx, sy, ) = start
     newpath = path + [dir]
     been = { }
-    (x, y) = (0, 0)
+    been["003"] = 1
+
+    (x, y, ) = (0, 0, )
     for idx, dir in enumerate(newpath):
         step = (idx % 3)+1
         for s in range(0, step):
@@ -118,16 +128,18 @@ def main():
     end = endPosition(board)
 
     while True:
-        (reached, description,) = hasReached(board, start, paths)
+        (reached, description, ) = hasReached(board, start, paths)
         if reached:
             print(description)
             exit()
 
         paths = [ path + [dir]
-                 for path in paths
-                 for dir in range(1, 5)
-                 if canadd(board, start, path, dir)
+                  for path in paths
+                  for dir in range(1, 5)
+                  if canadd(board, start, path, dir)
                 ]
+
+        print(f"Tracking {len(paths)} paths...")
 
 if __name__ == "__main__":
     main()
