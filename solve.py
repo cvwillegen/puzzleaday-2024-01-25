@@ -140,6 +140,8 @@ def main():
                 ]
 
         print(f"Tracking {len(paths)} paths...")
+        if len(paths) == 0:
+            raise Exception("No solution can be found!")
 
 if __name__ == "__main__":
     main()
